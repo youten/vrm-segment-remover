@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+    <title>REALITY VRM Segment Remover 0.1.1</title>
+    <style>
+      html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #231F20; font-family: sans-serif; }
+      #unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; background: #231F20; }
+      #unity-loading-bar { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 320px; color: #ddd; text-align: center; display: none; }
+      #unity-progress-bar-empty { margin-top: 12px; height: 12px; background: #444; border-radius: 6px; overflow: hidden; }
+      #unity-progress-bar-full { width: 0%; height: 100%; background: #4fc3f7; }
+      #unity-warning { position: fixed; left: 50%; top: 5%; transform: translate(-50%); background: white; padding: 10px; display: none; }
+    </style>
+  </head>
+  <body>
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="unity-loading-bar">
+      <div>Loading... (読み込み中)</div>
+      <div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div>
+    </div>
+    <div id="unity-warning"></div>
+    <script>
+      var canvas = document.querySelector("#unity-canvas");
+
+      function unityShowBanner(msg, type) {
+        var warningBanner = document.querySelector("#unity-warning");
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/82a846f23b8b51884cfe5f62dfadcd8e.loader.js";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/2d076c084ad3739e231ed3f0851a4169.data",
+        frameworkUrl: buildUrl + "/1859653d72fcc3248a6b1cad7293f744.framework.js",
+        codeUrl: buildUrl + "/cb093410b04a0c936327d63815b04f11.wasm",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "ReDo",
+        productName: "REALITY VRM Segment Remover 0.1.1",
+        productVersion: "0.1.1",
+        showBanner: unityShowBanner,
+      };
+
+      document.querySelector("#unity-loading-bar").style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+        }).then(() => {
+          document.querySelector("#unity-loading-bar").style.display = "none";
+        }).catch((message) => {
+          alert(message);
+        });
+      };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>
